@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/nav_social"
+        android:icon="@drawable/ic_social"
+        android:title="Social" />
+
+    <item
+        android:id="@+id/nav_professional"
+        android:icon="@drawable/ic_professional"
+        android:title="Professional" />
+
+    <item
+        android:id="@+id/nav_others"
+        android:icon="@drawable/ic_misc"
+        android:title="Others" />
+</menu>
