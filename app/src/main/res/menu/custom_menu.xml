@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/refresh"
+        android:title="Refresh" />
+
+    <item
+        android:id="@+id/sendnotif"
+        android:title="Show notification"
+        />
+
+    <item
+        android:id="@+id/cancelall"
+        android:title="Cancel all"
+        />
+    <item
+        android:id="@+id/action_notification_settings"
+        android:title="Notification Settings"
+        app:showAsAction="never"
+        />
+</menu>

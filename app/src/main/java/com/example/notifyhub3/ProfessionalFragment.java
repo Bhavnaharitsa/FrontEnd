@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.service.notification.StatusBarNotification;
@@ -115,7 +116,23 @@ public class ProfessionalFragment extends Fragment implements ItemTouchCallback 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
-        inflater.inflate(R.menu.refresh_item, menu);
+        inflater.inflate(R.menu.custom_menu, menu);
+    }
+
+    @Override
+    public void onPrepareOptionsMenu(Menu menu)
+    {
+        MenuItem menuItem;
+        menuItem = menu.findItem(R.id.action_notification_settings);
+        if (menuItem != null)
+        {
+            menuItem.setVisible(BuildConfig.DEBUG);
+        }
+        menuItem = menu.findItem(R.id.action_notification_settings);
+        if (menuItem != null)
+        {
+            menuItem.setVisible(BuildConfig.DEBUG && NotificationMonitor.supportsNotificationListenerSettings());
+        }
     }
 
     @Override
@@ -127,6 +144,22 @@ public class ProfessionalFragment extends Fragment implements ItemTouchCallback 
 //                mContext.sendBroadcast(intent);
                 getCurrentNotificationString();
 //                Toast.makeText(mContext, "Refresh clicked", Toast.LENGTH_SHORT).show();
+                break;
+
+            case R.id.sendnotif:
+                String listNos = getCurrentNotificationOnly();
+                createNotification(mContext, "Professional Notifications", listNos);
+                break;
+
+            case R.id.cancelall:
+                Intent intent = new Intent(NotificationMonitor.ACTION_NLS_CONTROL);
+                intent.putExtra("command", "cancel_all");
+                mContext.sendBroadcast(intent);
+                break;
+
+            case R.id.action_notification_settings:
+                startActivity(NotificationMonitor.getIntentNotificationListenerSettings());
+                return true;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -146,17 +179,30 @@ public class ProfessionalFragment extends Fragment implements ItemTouchCallback 
         StatusBarNotification[] currentNos = NotificationMonitor.getCurrentNotifications();
         if (currentNos != null) {
             for (int i = 0; i < currentNos.length; i++) {
-//                    listNos = i +" " + currentNos[i].getPackageName() + "\n" + listNos;
 
                 if(Constants.PROFESSIONAL_LIST.contains(currentNos[i].getPackageName())) {
                     itemAdapter.add(new NotificationView(currentNos[i].getPackageName()));
                     fastAdapter.notifyAdapterDataSetChanged();
+                    listNos = i +" " + currentNos[i].getPackageName() + "\n" + listNos;
                 }
             }
         }
         return listNos;
     }
 
+    private String getCurrentNotificationOnly(){
+        String listNos = "";
+        StatusBarNotification[] currentNos = NotificationMonitor.getCurrentNotifications();
+        if (currentNos != null) {
+            for (int i = 0; i < currentNos.length; i++) {
+
+                if(Constants.PROFESSIONAL_LIST.contains(currentNos[i].getPackageName())) {
+                    listNos = i +" " + currentNos[i].getPackageName() + "\n" + listNos;
+                }
+            }
+        }
+        return listNos;
+    }
     private void listCurrentNotification() {
         String result = "";
         if (isEnabledNLS) {
@@ -202,13 +248,13 @@ public class ProfessionalFragment extends Fragment implements ItemTouchCallback 
         return false;
     }
 
-    private void createNotification(Context context) {
+    private void createNotification(Context context, String title, String text) {
         NotificationManager manager = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
         NotificationCompat.Builder ncBuilder = new NotificationCompat.Builder(context);
-        ncBuilder.setContentTitle("My Notification");
-        ncBuilder.setContentText("Notification Listener Service Example");
-        ncBuilder.setTicker("Notification Listener Service Example");
-        ncBuilder.setSmallIcon(R.drawable.ic_launcher_background);
+        ncBuilder.setContentTitle(title);
+        ncBuilder.setContentText(text);
+//        ncBuilder.setTicker("Notification Listener Service Example");
+        ncBuilder.setSmallIcon(android.R.drawable.btn_plus);
         ncBuilder.setAutoCancel(true);
         ncBuilder.setChannelId("channelOne");
         manager.notify((int) System.currentTimeMillis(), ncBuilder.build());
@@ -260,4 +306,7 @@ public class ProfessionalFragment extends Fragment implements ItemTouchCallback 
                         })
                 .create().show();
     }
+
+
+
 }

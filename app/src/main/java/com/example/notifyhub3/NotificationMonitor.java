@@ -1,11 +1,16 @@
 package com.example.notifyhub3;
 
+import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.media.RemoteController;
+import android.os.Build;
 import android.os.IBinder;
+import android.provider.Settings;
 import android.service.notification.NotificationListenerService;
 import android.service.notification.StatusBarNotification;
 import android.text.TextUtils;
@@ -34,7 +39,8 @@ import android.service.notification.StatusBarNotification;
 import android.text.TextUtils;
 import android.util.Log;
 
-public class NotificationMonitor extends NotificationListenerService {
+public class NotificationMonitor extends NotificationListenerService implements RemoteController.OnClientUpdateListener
+{
     private static final String TAG = "SevenNLS";
     private static final String TAG_PRE = "[" + NotificationMonitor.class.getSimpleName() + "] ";
     private static final int EVENT_UPDATE_CURRENT_NOS = 0;
@@ -44,7 +50,12 @@ public class NotificationMonitor extends NotificationListenerService {
     public static StatusBarNotification mPostedNotification;
     public static StatusBarNotification mRemovedNotification;
     private CancelNotificationReceiver mReceiver = new CancelNotificationReceiver();
-    // String a;
+    private static final int VERSION_SDK_INT = Build.VERSION.SDK_INT;
+
+    public static boolean supportsNotificationListenerSettings()
+    {
+        return VERSION_SDK_INT >= 19;
+    }
 
     private Handler mMonitorHandler = new Handler() {
         @Override
@@ -58,6 +69,31 @@ public class NotificationMonitor extends NotificationListenerService {
             }
         }
     };
+
+    @Override
+    public void onClientChange(boolean clearing) {
+
+    }
+
+    @Override
+    public void onClientPlaybackStateUpdate(int state) {
+
+    }
+
+    @Override
+    public void onClientPlaybackStateUpdate(int state, long stateChangeTimeMs, long currentPosMs, float speed) {
+
+    }
+
+    @Override
+    public void onClientTransportControlUpdate(int transportControlFlags) {
+
+    }
+
+    @Override
+    public void onClientMetadataUpdate(RemoteController.MetadataEditor metadataEditor) {
+
+    }
 
     class CancelNotificationReceiver extends BroadcastReceiver {
 
@@ -181,6 +217,23 @@ public class NotificationMonitor extends NotificationListenerService {
 
     private static void logNLS(Object object) {
         Log.i(TAG, TAG_PRE + object);
+    }
+
+    @SuppressLint("InlinedApi")
+    @TargetApi(19)
+    public static Intent getIntentNotificationListenerSettings()
+    {
+        final String ACTION_NOTIFICATION_LISTENER_SETTINGS;
+        if (VERSION_SDK_INT >= 22)
+        {
+            ACTION_NOTIFICATION_LISTENER_SETTINGS = Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS;
+        }
+        else
+        {
+            ACTION_NOTIFICATION_LISTENER_SETTINGS = "android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS";
+        }
+
+        return new Intent(ACTION_NOTIFICATION_LISTENER_SETTINGS);
     }
 
 }
