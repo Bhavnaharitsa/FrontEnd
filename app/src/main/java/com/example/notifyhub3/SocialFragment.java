@@ -29,10 +29,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.mikepenz.fastadapter.FastAdapter;
 import com.mikepenz.fastadapter.adapters.ItemAdapter;
-import com.mikepenz.fastadapter.listeners.ItemFilterListener;
 import com.mikepenz.fastadapter_extensions.drag.ItemTouchCallback;
-
-import java.util.List;
 
 import static android.content.Context.NOTIFICATION_SERVICE;
 import static android.provider.Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS;
@@ -64,7 +61,7 @@ public class SocialFragment extends Fragment implements ItemTouchCallback {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View fragmentView = inflater.inflate(R.layout.fragment_others, container, false);
+        View fragmentView = inflater.inflate(R.layout.fragment, container, false);
         recyclerView = fragmentView.findViewById(R.id.recycler_others);
         itemAdapter = new ItemAdapter<>();
         fastAdapter = FastAdapter.with(itemAdapter);

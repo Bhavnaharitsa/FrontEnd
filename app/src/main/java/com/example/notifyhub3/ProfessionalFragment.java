@@ -64,7 +64,7 @@ public class ProfessionalFragment extends Fragment implements ItemTouchCallback 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View fragmentView = inflater.inflate(R.layout.fragment_others, container, false);
+        View fragmentView = inflater.inflate(R.layout.fragment, container, false);
         recyclerView = fragmentView.findViewById(R.id.recycler_others);
         itemAdapter = new ItemAdapter<>();
         fastAdapter = FastAdapter.with(itemAdapter);
