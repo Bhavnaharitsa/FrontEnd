@@ -94,7 +94,7 @@ public class OthersFragment extends Fragment implements ItemTouchCallback {
             public void onReceive(Context context, Intent intent) {
                 if(intent.getStringExtra("notificationremoved") != null){
                     itemAdapter = new ItemAdapter<>();
-
+                    fastAdapter = FastAdapter.with(itemAdapter);
                     recyclerView.setAdapter(fastAdapter);
                     Toast.makeText(mContext, "Refresh again to see live notifications", Toast.LENGTH_LONG).show();
                 }
