@@ -116,15 +116,6 @@ public class NotificationMonitor extends NotificationListenerService implements 
                     else if(TextUtils.equals(command, "get_others")){
 
                     }
-                    else if(packageName != null){
-                        StatusBarNotification[] listOfNotifs = getCurrentNotifications();
-                        for(StatusBarNotification sbn : listOfNotifs){
-                            if(packageName.equals(sbn.getPackageName())){
-                                Log.d(TAG, "onReceive: " + "Reached here " + sbn.getPackageName());
-                                cancelNotification(sbn.getKey());
-                            }
-                        }
-                    }
                 }
             }
         }

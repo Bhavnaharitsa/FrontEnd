@@ -72,22 +72,6 @@ public class OthersFragment extends Fragment implements ItemTouchCallback {
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(fastAdapter);
 
-                    fastAdapter.withSelectable(true);
-            fastAdapter.withOnClickListener(new OnClickListener<NotificationView>() {
-                @Override
-                public boolean onClick(@Nullable View v, IAdapter<NotificationView> adapter, NotificationView item, int position) {
-                    Intent intent = new Intent(NotificationMonitor.ACTION_NLS_CONTROL);
-                    intent.putExtra("packagename", item.getMessage());
-                    mContext.sendBroadcast(intent);
-                    itemAdapter = new ItemAdapter<>();
-                    fastAdapter = FastAdapter.with(itemAdapter);
-                    recyclerView.setAdapter(fastAdapter);
-                    fastAdapter.notifyAdapterDataSetChanged();
-//                    getCurrentNotificationString();
-                    return false;
-                }
-            });
-
         //Handle Broadcasts from NotificationMonitor service
         broadcastReceiver = new BroadcastReceiver() {
             @Override
