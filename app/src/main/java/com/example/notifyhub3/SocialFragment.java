@@ -18,6 +18,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -91,10 +92,12 @@ public class SocialFragment extends Fragment implements ItemTouchCallback {
         broadcastReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                String data = intent.getStringExtra("data_others");
-
-                itemAdapter.add(new NotificationView(data));
-                fastAdapter.notifyAdapterDataSetChanged();
+                if(intent.getStringExtra("notificationremoved") != null){
+                    itemAdapter = new ItemAdapter<>();
+                    fastAdapter = FastAdapter.with(itemAdapter);
+                    recyclerView.setAdapter(fastAdapter);
+                    Toast.makeText(mContext, "Refresh again to see live notifications", Toast.LENGTH_LONG).show();
+                }
             }
         };
         IntentFilter intentFilter = new IntentFilter(NotificationMonitor.ACTION_NLS_CONTROL);
