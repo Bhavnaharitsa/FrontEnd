@@ -160,6 +160,8 @@ public class MainActivity extends AppCompatActivity implements ItemTouchCallback
             IntentFilter intentFilter = new IntentFilter(NotificationMonitor.ACTION_NLS_CONTROL);
             registerReceiver(broadcastReceiver, intentFilter);
 
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new SocialFragment()).commit();
+
         }
 
 
