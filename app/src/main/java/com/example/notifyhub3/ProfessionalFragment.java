@@ -151,12 +151,6 @@ public class ProfessionalFragment extends Fragment implements ItemTouchCallback 
                 createNotification(mContext, "Professional Notifications", listNos);
                 break;
 
-            case R.id.cancelall:
-                Intent intent = new Intent(NotificationMonitor.ACTION_NLS_CONTROL);
-                intent.putExtra("command", "cancel_all");
-                mContext.sendBroadcast(intent);
-                break;
-
             case R.id.action_notification_settings:
                 startActivity(NotificationMonitor.getIntentNotificationListenerSettings());
                 return true;
