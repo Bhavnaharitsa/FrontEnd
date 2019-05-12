@@ -11,6 +11,10 @@
         />
 
     <item
+        android:id="@+id/cancelall"
+        android:title="Cancel all"
+        />
+    <item
         android:id="@+id/action_notification_settings"
         android:title="Notification Settings"
         app:showAsAction="never"
