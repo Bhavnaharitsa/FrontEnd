@@ -16,45 +16,32 @@ import android.provider.Settings;
 import android.service.notification.StatusBarNotification;
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.MenuItem;
-import android.view.View;
-import android.widget.TextView;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.NotificationCompat;
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.mikepenz.fastadapter.FastAdapter;
-import com.mikepenz.fastadapter.IAdapter;
 import com.mikepenz.fastadapter.adapters.ItemAdapter;
 import com.mikepenz.fastadapter.listeners.ItemFilterListener;
-import com.mikepenz.fastadapter.listeners.OnClickListener;
 import com.mikepenz.fastadapter_extensions.drag.ItemTouchCallback;
 
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements ItemTouchCallback, ItemFilterListener<NotificationView> {
 
-        private static final String TAG = "SevenNLS";
-        private static final String TAG_PRE = "["+MainActivity.class.getSimpleName()+"] ";
-        private static final int EVENT_SHOW_CREATE_NOS = 0;
-        private static final int EVENT_LIST_CURRENT_NOS = 1;
-        private static final String ENABLED_NOTIFICATION_LISTENERS = "enabled_notification_listeners";
-        private static final String ACTION_NOTIFICATION_LISTENER_SETTINGS = "android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS";
-        private boolean isEnabledNLS = false;
+    private static final String TAG = "SevenNLS";
+    private static final String TAG_PRE = "["+MainActivity.class.getSimpleName()+"] ";
+    private static final int EVENT_SHOW_CREATE_NOS = 0;
+    private static final int EVENT_LIST_CURRENT_NOS = 1;
+    private static final String ENABLED_NOTIFICATION_LISTENERS = "enabled_notification_listeners";
+    private static final String ACTION_NOTIFICATION_LISTENER_SETTINGS = "android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS";
+    private boolean isEnabledNLS = false;
 
         BroadcastReceiver broadcastReceiver;
-    private TextView cardTextView;
-        RecyclerView recyclerView;
-        FloatingActionButton fab;
-    List<NotificationView> cardList;
     FastAdapter<NotificationView> fastAdapter;
     ItemAdapter<NotificationView> itemAdapter;
 
@@ -81,44 +68,10 @@ public class MainActivity extends AppCompatActivity implements ItemTouchCallback
         protected void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             setContentView(R.layout.activity_main);
-//            mTextView = (TextView) findViewById(R.id.text_card);
-//            cardTextView = findViewById(R.id.text_card);
-            bottomNav = findViewById(R.id.bottom_navigation);
 
-            bottomNav.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
-                @Override
-                public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-                    Fragment selectedFragment = null;
-
-                    switch (menuItem.getItemId()){
-                        case R.id.nav_social:
-                            selectedFragment = new SocialFragment();
-                            break;
-
-                        case R.id.nav_professional:
-                            selectedFragment = new ProfessionalFragment();
-                            break;
-
-                        case R.id.nav_others:
-                            selectedFragment = new OthersFragment();
-                            break;
-                    }
-
-
-                    getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
+            Fragment selectedFragment = new NotificationFragment();
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
                             selectedFragment).commit();
-                    return true;
-                }
-            });
-
-
-//            fab = findViewById(R.id.fab);
-
-//            recyclerView = findViewById(R.id.recycler);
-//            itemAdapter = new ItemAdapter<>();
-//            fastAdapter = FastAdapter.with(itemAdapter);
-//            recyclerView.setLayoutManager(new LinearLayoutManager(this, RecyclerView.VERTICAL, false));
-//            recyclerView.setAdapter(fastAdapter);
 
             if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
                 NotificationChannel channel = new NotificationChannel("channelOne", "channelOne", NotificationManager.IMPORTANCE_DEFAULT);
@@ -126,32 +79,11 @@ public class MainActivity extends AppCompatActivity implements ItemTouchCallback
                 manager.createNotificationChannel(channel);
             }
 
-//            fab.setOnClickListener(new View.OnClickListener() {
-//                @Override
-//                public void onClick(View v) {
-//                    listCurrentNotification();
-//                }
-//            });
-
-//            fastAdapter.withSelectable(true);
-//            fastAdapter.withOnClickListener(new OnClickListener<NotificationView>() {
-//                @Override
-//                public boolean onClick(@Nullable View v, IAdapter<NotificationView> adapter, NotificationView item, int position) {
-//                    Intent intent = new Intent(NotificationMonitor.ACTION_NLS_CONTROL);
-//                    intent.putExtra("packagename", item.getMessage());
-//                    MainActivity.this.sendBroadcast(intent);
-//
-//                    return false;
-//                }
-//            });
-
             broadcastReceiver = new BroadcastReceiver() {
                 @Override
                 public void onReceive(Context context, Intent intent) {
                     if (intent.getStringExtra("notificationremoved") != null) {
-//                        fastAdapter = FastAdapter.with(itemAdapter);
-//                        recyclerView.setAdapter(fastAdapter);
-//                        fastAdapter.notifyAdapterDataSetChanged();
+
                     }
 
                 }
@@ -159,8 +91,6 @@ public class MainActivity extends AppCompatActivity implements ItemTouchCallback
 
             IntentFilter intentFilter = new IntentFilter(NotificationMonitor.ACTION_NLS_CONTROL);
             registerReceiver(broadcastReceiver, intentFilter);
-
-            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new SocialFragment()).commit();
 
         }
 
@@ -175,36 +105,6 @@ public class MainActivity extends AppCompatActivity implements ItemTouchCallback
             }
         }
 
-//        public void buttonOnClicked(View view) {
-//            mTextView.setTextColor(Color.BLACK);
-//            switch (view.getId()) {
-//                case R.id.btnCreateNotify:
-//                    logNLS("Create notifications...");
-//                    createNotification(this);
-//                    mHandler.sendMessageDelayed(mHandler.obtainMessage(EVENT_SHOW_CREATE_NOS), 50);
-//                    break;
-//                case R.id.btnClearLastNotify:
-//                    logNLS("Clear Last notification...");
-//                    clearLastNotification();
-//                    mHandler.sendMessageDelayed(mHandler.obtainMessage(EVENT_LIST_CURRENT_NOS), 50);
-//                    break;
-//                case R.id.btnClearAllNotify:
-//                    logNLS("Clear All notifications...");
-//                    clearAllNotifications();
-//                    mHandler.sendMessageDelayed(mHandler.obtainMessage(EVENT_LIST_CURRENT_NOS), 50);
-//                    break;
-//                case R.id.btnListNotify:
-//                    logNLS("List notifications...");
-//                    listCurrentNotification();
-//                    break;
-//                case R.id.btnEnableUnEnableNotify:
-//                    logNLS("Enable/UnEnable notification...");
-//                    openNotificationAccess();
-//                    break;
-//                default:
-//                    break;
-//            }
-//        }
 
         private boolean isEnabled() {
             String pkgName = getPackageName();

@@ -29,18 +29,16 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.mikepenz.fastadapter.FastAdapter;
-import com.mikepenz.fastadapter.IAdapter;
 import com.mikepenz.fastadapter.adapters.ItemAdapter;
-import com.mikepenz.fastadapter.listeners.OnClickListener;
 import com.mikepenz.fastadapter_extensions.drag.ItemTouchCallback;
 
 import static android.content.Context.NOTIFICATION_SERVICE;
 import static android.provider.Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS;
 
-public class OthersFragment extends Fragment implements ItemTouchCallback {
+public class NotificationFragment extends Fragment implements ItemTouchCallback {
 
-    private static String TAG = "OthersFragment";
-    private static final String TAG_PRE = "["+OthersFragment.class.getSimpleName()+"] ";
+    private static String TAG = "NotificationFragment";
+    private static final String TAG_PRE = "["+ NotificationFragment.class.getSimpleName()+"] ";
 
 
     private RecyclerView recyclerView;
@@ -150,11 +148,9 @@ public class OthersFragment extends Fragment implements ItemTouchCallback {
         StatusBarNotification[] currentNos = NotificationMonitor.getCurrentNotifications();
         if (currentNos != null) {
             for (int i = 0; i < currentNos.length; i++) {
-                if(!(Constants.PROFESSIONAL_LIST.contains(currentNos[i].getPackageName()) || Constants.SOCIAL_LIST.contains(currentNos[i].getPackageName()))) {
                     itemAdapter.add(new NotificationView(currentNos[i].getPackageName()));
                     fastAdapter.notifyAdapterDataSetChanged();
                     listNos = i +" " + currentNos[i].getPackageName() + "\n" + listNos;
-                }
             }
         }
         return listNos;
