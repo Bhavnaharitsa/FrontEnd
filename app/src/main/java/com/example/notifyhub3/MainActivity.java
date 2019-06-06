@@ -24,10 +24,14 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.NotificationCompat;
 import androidx.fragment.app.Fragment;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.NetworkResponse;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.VolleyLog;
+import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -36,30 +40,34 @@ import com.mikepenz.fastadapter.adapters.ItemAdapter;
 import com.mikepenz.fastadapter.listeners.ItemFilterListener;
 import com.mikepenz.fastadapter_extensions.drag.ItemTouchCallback;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements ItemTouchCallback, ItemFilterListener<NotificationView> {
-    final TextView textView = (TextView) findViewById(R.id.text);
-// ...
-
-    // Instantiate the RequestQueue.
-    RequestQueue queue = Volley.newRequestQueue(this);
-    String url ="http://www.google.com";
-
-    // Request a string response from the provided URL.
-    StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
-            new Response.Listener<String>() {
-                @Override
-                public void onResponse(String response) {
-                    // Display the first 500 characters of the response string.
-                    textView.setText("Response is: "+ response.substring(0,500));
-                }
-            }, new Response.ErrorListener() {
-        @Override
-        public void onErrorResponse(VolleyError error) {
-            textView.setText("That didn't work!");
-        }
-    });
+//    final TextView textView = (TextView) findViewById(R.id.text);
+//// ...
+//
+//    // Instantiate the RequestQueue.
+//    RequestQueue queue = Volley.newRequestQueue(this);
+//    String url ="http://www.google.com";
+//
+//    // Request a string response from the provided URL.
+//    StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+//            new Response.Listener<String>() {
+//                @Override
+//                public void onResponse(String response) {
+//                    // Display the first 500 characters of the response string.
+//                    textView.setText("Response is: "+ response.substring(0,500));
+//                }
+//            }, new Response.ErrorListener() {
+//        @Override
+//        public void onErrorResponse(VolleyError error) {
+//            textView.setText("That didn't work!");
+//        }
+//    });
 
 // Add the request to the RequestQueue.
 
@@ -291,5 +299,7 @@ public class MainActivity extends AppCompatActivity implements ItemTouchCallback
     public void itemTouchDropped(int oldPosition, int newPosition) {
 
     }
+
+
 }
 
