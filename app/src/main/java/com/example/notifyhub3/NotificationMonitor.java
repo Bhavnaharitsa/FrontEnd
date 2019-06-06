@@ -2,45 +2,34 @@ package com.example.notifyhub3;
 
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
-import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.media.RemoteController;
 import android.os.Build;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Message;
 import android.provider.Settings;
 import android.service.notification.NotificationListenerService;
 import android.service.notification.StatusBarNotification;
 import android.text.TextUtils;
 import android.util.Log;
+import android.widget.Toast;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import android.app.Notification;
-import android.app.Notification.Action;
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
-import android.graphics.Bitmap;
-import android.os.Bundle;
-import android.os.Handler;
-import android.os.IBinder;
-import android.os.Message;
-import android.service.notification.NotificationListenerService;
-import android.service.notification.StatusBarNotification;
-import android.text.TextUtils;
-import android.util.Log;
-
-public class NotificationMonitor extends NotificationListenerService implements RemoteController.OnClientUpdateListener
-{
+public class NotificationMonitor extends NotificationListenerService implements RemoteController.OnClientUpdateListener {
     private static final String TAG = "SevenNLS";
     private static final String TAG_PRE = "[" + NotificationMonitor.class.getSimpleName() + "] ";
     private static final int EVENT_UPDATE_CURRENT_NOS = 0;
@@ -52,8 +41,7 @@ public class NotificationMonitor extends NotificationListenerService implements 
     private CancelNotificationReceiver mReceiver = new CancelNotificationReceiver();
     private static final int VERSION_SDK_INT = Build.VERSION.SDK_INT;
 
-    public static boolean supportsNotificationListenerSettings()
-    {
+    public static boolean supportsNotificationListenerSettings() {
         return VERSION_SDK_INT >= 19;
     }
 
@@ -112,8 +100,7 @@ public class NotificationMonitor extends NotificationListenerService implements 
                         }
                     } else if (TextUtils.equals(command, "cancel_all")) {
                         cancelAllNotifications();
-                    }
-                    else if(TextUtils.equals(command, "get_others")){
+                    } else if (TextUtils.equals(command, "get_others")) {
 
                     }
                 }
@@ -146,12 +133,76 @@ public class NotificationMonitor extends NotificationListenerService implements 
     }
 
     @Override
-    public void onNotificationPosted(StatusBarNotification sbn) {
-        updateCurrentNotifications();
-        logNLS("onNotificationPosted...");
-        logNLS("have " + mCurrentNotificationsCounts + " active notifications");
-        mPostedNotification = sbn;
+    public void onNotificationPosted(StatusBarNotification sbn){
+    String notifId = "" + sbn.getId();
+    String appName = sbn.getPackageName();
+    String channelId = sbn.getNotification().getChannelId();
+    String channelName = "dummy_channel_name"; //figure out later
+    String channelType = "dummy_channel_type" ; // dummy data as of now
 
+    String arrivalTime = ""; //Is set later on
+    String userName = "dummy_user";
+    String mobileNum = "9876" ;
+    String gender = "A";
+    String age = "10";
+    String appId = "";
+
+    JSONArray mJsonArray;
+   try {
+       StatusBarNotification[] activeNotifications = getActiveNotifications();
+       Log.d(TAG, "onNotificationPosted: " + getPackageName() + "Active Notifications" + activeNotifications);
+   }
+   catch (Exception e){}
+   try {
+       String text = (String) sbn.getNotification().tickerText;
+       Log.d(TAG, "onNotificationsPosted: " + getPackageName() + "Key " + text);
+   }
+   catch (Exception e){}
+   try {
+       String getKey = (String) sbn.getKey();
+       Log.d(TAG, "onNotificationsPosted: " + getPackageName() + "Key " + getKey);
+   }
+   catch (Exception e){}
+   try {
+       StatusBarNotification clonedObject = sbn.clone();
+       Log.d(TAG, " onNotificationsPosted: " + getPackageName() + "Clone Data " + clonedObject);
+   }
+   catch (Exception e){}
+   try {
+       int describeObject = sbn.describeContents();
+       Log.d(TAG, "onNotificationsPxosted: " + getPackageName() + "Clone Data " + describeObject);
+   }
+   catch (Exception e){}
+        updateCurrentNotifications();
+   try {
+       logNLS("onNotificationPosted...");
+       logNLS("have " + mCurrentNotificationsCounts + " active notifications");
+       mPostedNotification = sbn;
+   }
+   catch (Exception e){}
+   try {
+
+       Calendar cal = Calendar.getInstance();
+       Date date = cal.getTime();
+       DateFormat timeFormat = new SimpleDateFormat("HH:mm:ss");
+       DateFormat dateFormat = new SimpleDateFormat("yyyy / MM / dd ");
+       String formattedTime = timeFormat.format(date);
+       String formattedDate = dateFormat.format(date);
+       arrivalTime = formattedTime;
+       Log.d(TAG, "onNotificationPosted: " + sbn.getPackageName() + " Time: " + formattedTime + " Date: " + formattedDate);
+
+       mJsonArray = new JSONArray();
+       JsonItem item = new JsonItem(
+               notifId, appId, appName, channelId, channelName, channelType,
+               arrivalTime, userName, mobileNum, gender, age);
+       mJsonArray.put(toJson(item));
+
+       Log.d(TAG, "onNotificationPosted: " + mJsonArray.toString());
+       Toast.makeText(getApplicationContext(), mJsonArray.toString(), Toast.LENGTH_SHORT).show();
+   }
+   catch (Exception e){}
+
+        //display(strDate);
         /*
          * Bundle extras = sbn.getNotification().extras; String
          * notificationTitle = extras.getString(Notification.EXTRA_TITLE);
@@ -173,15 +224,60 @@ public class NotificationMonitor extends NotificationListenerService implements 
     }
 
     @Override
-    public void onNotificationRemoved(StatusBarNotification sbn) {
+    public void onNotificationRemoved(StatusBarNotification sbn, RankingMap rankingMap, int reason) {
+        super.onNotificationRemoved(sbn, rankingMap, reason);
+        try {
+            String context = (String) sbn.getNotification().tickerText;
+            Log.d(TAG, "onNotificationRemoved: " + getPackageName() + "Key " + context);
+        } catch (Exception e) {
+        }
+        try {
+            String otherMetrics = (String) sbn.getKey();
+            Log.d(TAG, "onNotificationRemoved: " + getPackageName() + "Key " + otherMetrics);
+        } catch (Exception e) {
+        }
+        try {
+            StatusBarNotification clonedObject = sbn.clone();
+            Log.d(TAG, "onNotificationRemoved: " + getPackageName() + "Clone Data " + clonedObject);
+        } catch (Exception e) {
+        }
+        try {
+            int describeObject = sbn.describeContents();
+            Log.d(TAG, "onNotificationRemoved: " + getPackageName() + "Clone Data " + describeObject);
+        } catch (Exception e) {
+        }
         updateCurrentNotifications();
-        logNLS("removed...");
-        logNLS("have " + mCurrentNotificationsCounts + " active notifications");
-        mRemovedNotification = sbn;
+        try {
+            logNLS("removed...");
+            logNLS("have " + mCurrentNotificationsCounts + " active notifications");
+            mRemovedNotification = sbn;
+        } catch (Exception e) {
+        }
 
         Intent intent = new Intent(ACTION_NLS_CONTROL);
         intent.putExtra("notificationremoved", sbn.getPackageName());
         sendBroadcast(intent);
+        try {
+            Calendar cal = Calendar.getInstance();
+            Date date = cal.getTime();
+            DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
+            String formattedDate = dateFormat.format(date);
+            Log.d(TAG, "onNotificationRemoved: " + sbn.getPackageName() + " Time: " + formattedDate);
+        } catch (Exception e) {
+        }
+
+        try {
+            String myReason = "";
+            if (reason == REASON_CLICK)
+                myReason = "User clicked";
+            else if (reason == REASON_CANCEL)
+                myReason = "User swiped";
+            else if (reason == REASON_CANCEL_ALL)
+                myReason = "Clear all";
+
+            Log.d(TAG, "onNotificationRemoved: " + sbn.getPackageName() + " " + myReason);
+        } catch (Exception e) {
+        }
     }
 
     private void updateCurrentNotifications() {
@@ -199,11 +295,11 @@ public class NotificationMonitor extends NotificationListenerService implements 
     }
 
     public static StatusBarNotification[] getCurrentNotifications() {
-        if (mCurrentNotifications.size() == 0) {
-            logNLS("mCurrentNotifications size is ZERO!!");
-            return null;
-        }
-        return mCurrentNotifications.get(0);
+            if (mCurrentNotifications.size() == 0) {
+                logNLS("mCurrentNotifications size is ZERO!!");
+                return null;
+            }
+            return mCurrentNotifications.get(0);
     }
 
     private static void logNLS(Object object) {
@@ -225,6 +321,24 @@ public class NotificationMonitor extends NotificationListenerService implements 
         }
 
         return new Intent(ACTION_NOTIFICATION_LISTENER_SETTINGS);
+    }
+
+    public static JSONObject toJson(JsonItem item){
+        JSONObject jObj = new JSONObject();
+        try {
+            jObj.put("notif_id", item.getNotificationId());
+            jObj.put("app_id", item.getAppId());
+            jObj.put("app_name", item.getAppName());
+            jObj.put("channel_id", item.getChannelId());
+            jObj.put("channel_name", item.getChannelName());
+            jObj.put("arrival_time", item.getArrivalTime());
+            jObj.put("user_name", item.getUserName());
+            jObj.put("mobile_number", item.getMobileNumber());
+            jObj.put("gender", item.getGender());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return jObj;
     }
 
 }
