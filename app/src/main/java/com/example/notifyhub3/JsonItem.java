@@ -1,98 +1,105 @@
 package com.example.notifyhub3;
 
 public class JsonItem {
-    String notificationId;
-    String appId;
-    String appName;
-    String channelId;
 
+    String notification_id;
+    String channel_id;
+    String app_id;
+    String app_name;
+    String channel_name;
+    String channel_type;
+    String arrival_time;
+    String user_name;
+    String mobile_no;
+    String gender;
+    String age;
     public JsonItem(){
     }
 
     public JsonItem(String notificationId, String appId, String appName, String channelId, String channelName, String channelType, String arrivalTime, String userName, String mobileNumber, String gender, String age) {
-        this.notificationId = notificationId;
-        this.appId = appId;
-        this.appName = appName;
-        this.channelId = channelId;
-        this.channelName = channelName;
-        this.channelType = channelType;
-        this.arrivalTime = arrivalTime;
-        this.userName = userName;
-        this.mobileNumber = mobileNumber;
+        this.notification_id = notificationId;
+        this.app_id = appId;
+        this.app_name = appName;
+        this.channel_id = channelId;
+        this.channel_name = channelName;
+        this.channel_type= channelType;
+        this.arrival_time = arrivalTime;
+        this.user_name= userName;
+        this.mobile_no = mobileNumber;
         this.gender = gender;
         this.age = age;
     }
 
     public String getNotificationId() {
-        return notificationId;
+        return notification_id;
     }
 
     public void setNotificationId(String notificationId) {
-        this.notificationId = notificationId;
+        this.notification_id = notificationId;
     }
 
     public String getAppId() {
-        return appId;
+        return app_id;
     }
 
     public void setAppId(String appId) {
-        this.appId = appId;
+        this.app_id = appId;
     }
 
     public String getAppName() {
-        return appName;
+        return app_name;
     }
 
     public void setAppName(String appName) {
-        this.appName = appName;
+        this.app_name = appName;
     }
 
     public String getChannelId() {
-        return channelId;
+        return channel_id;
     }
 
     public void setChannelId(String channelId) {
-        this.channelId = channelId;
+        this.channel_id= channelId;
     }
 
     public String getChannelName() {
-        return channelName;
+        return channel_name;
     }
 
     public void setChannelName(String channelName) {
-        this.channelName = channelName;
+        this.channel_name = channelName;
     }
 
     public String getChannelType() {
-        return channelType;
+        return channel_type;
     }
 
     public void setChannelType(String channelType) {
-        this.channelType = channelType;
+        this.channel_type = channelType;
     }
 
     public String getArrivalTime() {
-        return arrivalTime;
+        return arrival_time;
     }
 
     public void setArrivalTime(String arrivalTime) {
-        this.arrivalTime = arrivalTime;
+        this.arrival_time = arrivalTime;
     }
 
     public String getUserName() {
-        return userName;
+        return user_name;
     }
 
     public void setUserName(String userName) {
-        this.userName = userName;
+        this.user_name= userName;
     }
 
     public String getMobileNumber() {
-        return mobileNumber;
+        return mobile_no;
     }
 
     public void setMobileNumber(String mobileNumber) {
-        this.mobileNumber = mobileNumber;
+        this.mobile_no = mobileNumber;
     }
 
     public String getGender() {
@@ -111,12 +118,5 @@ public class JsonItem {
         this.age = age;
     }
 
-    String channelName;
-    String channelType;
-    String arrivalTime;
-    String userName;
-    String mobileNumber;
-    String gender;
-    String age;
 
 }

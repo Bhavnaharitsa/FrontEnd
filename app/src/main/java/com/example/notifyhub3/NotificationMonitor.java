@@ -28,6 +28,8 @@ import com.android.volley.VolleyLog;
 import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -146,7 +148,7 @@ public class NotificationMonitor extends NotificationListenerService implements 
 
     @Override
     public void onNotificationPosted(StatusBarNotification sbn){
-    String notifId = "" + sbn.getId();
+    String notification_id = "" + sbn.getId();
     String appName = sbn.getPackageName();
     String channelId = sbn.getNotification().getChannelId();
     String channelName = "dummy_channel_name"; //figure out later
@@ -157,9 +159,9 @@ public class NotificationMonitor extends NotificationListenerService implements 
     String mobileNum = "9876" ;
     String gender = "A";
     String age = "10";
-    String appId = "";
+    String appId = "456";
 
-    final String URL = "http://ec2-18-221-242-64.us-east-2.compute.amazonaws.com:5000/notification_event_data";
+    final String URL = "http://3.13.113.167:5000/notification_event_data";
     JSONArray mJsonArray;
    try {
        StatusBarNotification[] activeNotifications = getActiveNotifications();
@@ -206,10 +208,11 @@ public class NotificationMonitor extends NotificationListenerService implements 
 
        mJsonArray = new JSONArray();
        JsonItem item = new JsonItem(
-               notifId, appId, appName, channelId, channelName, channelType,
+               notification_id, appId, appName, channelId, channelName, channelType,
                arrivalTime, userName, mobileNum, gender, age);
        JSONObject jObj = toJson(item);
        mJsonArray.put(jObj);
+       Log.d(TAG, "onNotificationPosted: " + jObj.toString());
 
        sendPOST(URL, jObj);
 
@@ -339,21 +342,11 @@ public class NotificationMonitor extends NotificationListenerService implements 
         return new Intent(ACTION_NOTIFICATION_LISTENER_SETTINGS);
     }
 
-    public static JSONObject toJson(JsonItem item){
-        JSONObject jObj = new JSONObject();
-        try {
-            jObj.put("notif_id", item.getNotificationId());
-            jObj.put("app_id", item.getAppId());
-            jObj.put("app_name", item.getAppName());
-            jObj.put("channel_id", item.getChannelId());
-            jObj.put("channel_name", item.getChannelName());
-            jObj.put("arrival_time", item.getArrivalTime());
-            jObj.put("user_name", item.getUserName());
-            jObj.put("mobile_number", item.getMobileNumber());
-            jObj.put("gender", item.getGender());
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+    public static JSONObject toJson(JsonItem item) throws JSONException {
+        Gson gson = new GsonBuilder().create();
+        String json = gson.toJson(item);
+        JSONObject jObj = new JSONObject(json);
+
         return jObj;
     }
 
