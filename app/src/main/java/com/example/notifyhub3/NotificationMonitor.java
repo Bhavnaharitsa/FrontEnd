@@ -51,7 +51,7 @@ public class NotificationMonitor extends NotificationListenerService implements 
     public static List<StatusBarNotification[]> mCurrentNotifications = new ArrayList<StatusBarNotification[]>();
     public static int mCurrentNotificationsCounts = 0;
     public static StatusBarNotification mPostedNotification;
-    public static StatusBarNotification mRemovedNotification;
+  //  public static StatusBarNotification mRemovedNotification;
     private CancelNotificationReceiver mReceiver = new CancelNotificationReceiver();
     private static final int VERSION_SDK_INT = Build.VERSION.SDK_INT;
 
@@ -64,7 +64,7 @@ public class NotificationMonitor extends NotificationListenerService implements 
         public void handleMessage(Message msg) {
             switch (msg.what) {
                 case EVENT_UPDATE_CURRENT_NOS:
-                    updateCurrentNotifications();
+                 //   updateCurrentNotifications();
                     break;
                 default:
                     break;
@@ -148,171 +148,114 @@ public class NotificationMonitor extends NotificationListenerService implements 
 
     @Override
     public void onNotificationPosted(StatusBarNotification sbn){
-    String notification_id = "" + sbn.getId();
-    String appName = sbn.getPackageName();
-    String channelId = sbn.getNotification().getChannelId();
-    String channelName = "dummy_channel_name"; //figure out later
-    String channelType = "dummy_channel_type" ; // dummy data as of now
 
-    String arrivalTime = ""; //Is set later on
-    String userName = "dummy_user";
-    String mobileNum = "9876" ;
-    String gender = "A";
-    String age = "10";
-    String appId = "456";
+    String notification_id = sbn.getKey();
+    String app_package_name = sbn.getPackageName();
+    String channel_id = sbn.getNotification().getChannelId();
+    long arrival_time =sbn.getPostTime(); //Is set later on
+    String notification_body= (String) sbn.getNotification().tickerText;
+    int user_hash=sbn.getUser().hashCode();
 
-    final String URL = "http://3.13.113.167:5000/notification_event_data";
-    JSONArray mJsonArray;
-   try {
-       StatusBarNotification[] activeNotifications = getActiveNotifications();
-       Log.d(TAG, "onNotificationPosted: " + getPackageName() + "Active Notifications" + activeNotifications);
-   }
-   catch (Exception e){}
-   try {
-       String text = (String) sbn.getNotification().tickerText;
-       Log.d(TAG, "onNotificationsPosted: " + getPackageName() + "Key " + text);
-   }
-   catch (Exception e){}
-   try {
-       String getKey = (String) sbn.getKey();
-       Log.d(TAG, "onNotificationsPosted: " + getPackageName() + "Key " + getKey);
-   }
-   catch (Exception e){}
-   try {
-       StatusBarNotification clonedObject = sbn.clone();
-       Log.d(TAG, " onNotificationsPosted: " + getPackageName() + "Clone Data " + clonedObject);
-   }
-   catch (Exception e){}
-   try {
-       int describeObject = sbn.describeContents();
-       Log.d(TAG, "onNotificationsPxosted: " + getPackageName() + "Clone Data " + describeObject);
-   }
-   catch (Exception e){}
-        updateCurrentNotifications();
-   try {
-       logNLS("onNotificationPosted...");
-       logNLS("have " + mCurrentNotificationsCounts + " active notifications");
-       mPostedNotification = sbn;
-   }
-   catch (Exception e){}
-   try {
+    final String URL = "http://3.13.113.167:5000/routes/notification_posted";
+    JSONArray JsonArrayNotificationPosted;
+  try{
+      String notif_id=(String) sbn.getKey();
+      Log.d(TAG, "NOTIFICATION ID" + notif_id);
 
-       Calendar cal = Calendar.getInstance();
-       Date date = cal.getTime();
-       DateFormat timeFormat = new SimpleDateFormat("HH:mm:ss");
-       DateFormat dateFormat = new SimpleDateFormat("yyyy / MM / dd ");
-       String formattedTime = timeFormat.format(date);
-       String formattedDate = dateFormat.format(date);
-       arrivalTime = formattedTime;
-       Log.d(TAG, "onNotificationPosted: " + sbn.getPackageName() + " Time: " + formattedTime + " Date: " + formattedDate);
+      String app_pack_name=sbn.getPackageName();
+      Log.d(TAG, "APP PACKAGE NAME" + app_pack_name);
 
-       mJsonArray = new JSONArray();
-       JsonItem item = new JsonItem(
-               notification_id, appId, appName, channelId, channelName, channelType,
-               arrivalTime, userName, mobileNum, gender, age);
-       JSONObject jObj = toJson(item);
-       mJsonArray.put(jObj);
-       Log.d(TAG, "onNotificationPosted: " + jObj.toString());
+      String channelID=sbn.getNotification().getChannelId();
+      Log.d(TAG, "CHANNEL ID"+ channelID);
 
-       sendPOST(URL, jObj);
+      long arrivalTime=sbn.getPostTime();
+      Log.d(TAG, " ARRIVAL TIME"+ arrivalTime);
 
-       Log.d(TAG, "onNotificationPosted: " + mJsonArray.toString());
-       Toast.makeText(getApplicationContext(), mJsonArray.toString(), Toast.LENGTH_SHORT).show();
+      String notif_body=(String) sbn.getNotification().tickerText;
+      Log.d(TAG, "NOTIFICATION BODY" + notif_body);
+
+      int UserHash= sbn.getUser().hashCode();
+      Log.d(TAG, " USER HASH"+UserHash);
+
+  }
+  catch (Exception exception){
+      Log.d(TAG, "Error Occured" + exception);
+  }
+
+   JsonArrayNotificationPosted= new JSONArray();
+   JsonItemPosted item = new JsonItemPosted(notification_id,notification_body,channel_id,app_package_name,user_hash,arrival_time);
+   JSONObject jObj = null;
+   try{
+   jObj = toJson(item);
+        } catch (JSONException e) {
+        Log.d(TAG, " JSON Error" +e);
+
    }
-   catch (Exception e){}
+   JsonArrayNotificationPosted.put(jObj);
+   Log.d(TAG, "onNotificationPosted: " + jObj.toString());
+   SendHttpNotificationPosted(URL, jObj);
+   Log.d(TAG, "onNotificationPosted: " + JsonArrayNotificationPosted.toString());
+   Toast.makeText(getApplicationContext(), JsonArrayNotificationPosted.toString(), Toast.LENGTH_SHORT).show();
+   }
 
-        //display(strDate);
-        /*
-         * Bundle extras = sbn.getNotification().extras; String
-         * notificationTitle = extras.getString(Notification.EXTRA_TITLE);
-         * Bitmap notificationLargeIcon = ((Bitmap)
-         * extras.getParcelable(Notification.EXTRA_LARGE_ICON)); Bitmap
-         * notificationSmallIcon = ((Bitmap)
-         * extras.getParcelable(Notification.EXTRA_SMALL_ICON)); CharSequence
-         * notificationText = extras.getCharSequence(Notification.EXTRA_TEXT);
-         * CharSequence notificationSubText =
-         * extras.getCharSequence(Notification.EXTRA_SUB_TEXT);
-         * Log.i("SevenNLS", "notificationTitle:"+notificationTitle);
-         * Log.i("SevenNLS", "notificationText:"+notificationText);
-         * Log.i("SevenNLS", "notificationSubText:"+notificationSubText);
-         * Log.i("SevenNLS",
-         * "notificationLargeIcon is null:"+(notificationLargeIcon == null));
-         * Log.i("SevenNLS",
-         * "notificationSmallIcon is null:"+(notificationSmallIcon == null));
-         */
-    }
 
     @Override
     public void onNotificationRemoved(StatusBarNotification sbn, RankingMap rankingMap, int reason) {
+        JSONArray JsonArrayNotificationRemoved;
+        // TO FIND DATE AND TIME
+        String InteractionTime = "";
+        Calendar cal = Calendar.getInstance();
+        Date date = cal.getTime();
+        DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
+        String formattedDate = dateFormat.format(date);
+        InteractionTime = formattedDate;
+        Log.d(TAG, "onNotificationRemoved: " + sbn.getPackageName() + " Time: " + formattedDate);
+
+        // TO FIND USER'S INTERACTION WITH THE NOTIFICATION
+        String myReason = "";
+        if (reason == REASON_CLICK)
+            myReason = "User clicked";
+        else if (reason == REASON_CANCEL)
+            myReason = "User swiped";
+        else if (reason == REASON_CANCEL_ALL)
+            myReason = "Clear all";
+        final String URLNotificationRemoved = "http://3.13.113.167:5000/routes/interaction_data";
+
         super.onNotificationRemoved(sbn, rankingMap, reason);
+        String notification_id = sbn.getKey();
+        Log.d(TAG, " NOTIFICATION ID " + notification_id);
+        String app_package_name = sbn.getPackageName();
+        Log.d(TAG, "APP PACKAGE NAME " + app_package_name);
+        String channel_id = sbn.getNotification().getChannelId();
+        Log.d(TAG, " CHANNEL ID " + channel_id);
+        String interaction_time = InteractionTime;
+        Log.d(TAG, " INTERACTION TIME " + interaction_time);
+        String interaction_type = myReason;
+        Log.d(TAG, " INTERACTION TYPE " + interaction_type);
+        long arrival_time = sbn.getPostTime();
+        Log.d(TAG, " ARRIVAL TIME " + arrival_time);
+        int user_hash = sbn.getUser().hashCode();
         try {
-            String context = (String) sbn.getNotification().tickerText;
-            Log.d(TAG, "onNotificationRemoved: " + getPackageName() + "Key " + context);
+            Log.d(TAG, " USER HASH " + user_hash);
         } catch (Exception e) {
+            Log.d(TAG, " Error Occured " + e);
         }
+        JsonArrayNotificationRemoved = new JSONArray();
+        JsonItemRemoved itemRemoved = new JsonItemRemoved(notification_id, channel_id, app_package_name, user_hash, arrival_time, interaction_time, interaction_type);
+        JSONObject jObj = null;
         try {
-            String otherMetrics = (String) sbn.getKey();
-            Log.d(TAG, "onNotificationRemoved: " + getPackageName() + "Key " + otherMetrics);
-        } catch (Exception e) {
-        }
-        try {
-            StatusBarNotification clonedObject = sbn.clone();
-            Log.d(TAG, "onNotificationRemoved: " + getPackageName() + "Clone Data " + clonedObject);
-        } catch (Exception e) {
-        }
-        try {
-            int describeObject = sbn.describeContents();
-            Log.d(TAG, "onNotificationRemoved: " + getPackageName() + "Clone Data " + describeObject);
-        } catch (Exception e) {
-        }
-        updateCurrentNotifications();
-        try {
-            logNLS("removed...");
-            logNLS("have " + mCurrentNotificationsCounts + " active notifications");
-            mRemovedNotification = sbn;
-        } catch (Exception e) {
-        }
+            jObj = toJson(itemRemoved);
+        } catch (JSONException e) {
+            Log.d(TAG, " JSON Error" + e);
 
-        Intent intent = new Intent(ACTION_NLS_CONTROL);
-        intent.putExtra("notificationremoved", sbn.getPackageName());
-        sendBroadcast(intent);
-        try {
-            Calendar cal = Calendar.getInstance();
-            Date date = cal.getTime();
-            DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
-            String formattedDate = dateFormat.format(date);
-            Log.d(TAG, "onNotificationRemoved: " + sbn.getPackageName() + " Time: " + formattedDate);
-        } catch (Exception e) {
         }
+        JsonArrayNotificationRemoved.put(jObj);
+        Log.d(TAG, "onNotificationPosted: " + jObj.toString());
+        SendHttpPostNotificationRemoved(URLNotificationRemoved, jObj);
+        Log.d(TAG, "onNotificationPosted: " + JsonArrayNotificationRemoved.toString());
+        Toast.makeText(getApplicationContext(), JsonArrayNotificationRemoved.toString(), Toast.LENGTH_SHORT).show();
 
-        try {
-            String myReason = "";
-            if (reason == REASON_CLICK)
-                myReason = "User clicked";
-            else if (reason == REASON_CANCEL)
-                myReason = "User swiped";
-            else if (reason == REASON_CANCEL_ALL)
-                myReason = "Clear all";
-
-            Log.d(TAG, "onNotificationRemoved: " + sbn.getPackageName() + " " + myReason);
-        } catch (Exception e) {
-        }
     }
-
-    private void updateCurrentNotifications() {
-        try {
-            StatusBarNotification[] activeNos = getActiveNotifications();
-            if (mCurrentNotifications.size() == 0) {
-                mCurrentNotifications.add(null);
-            }
-            mCurrentNotifications.set(0, activeNos);
-            mCurrentNotificationsCounts = activeNos.length;
-        } catch (Exception e) {
-            logNLS("Should not be here!!");
-            e.printStackTrace();
-        }
-    }
-
     public static StatusBarNotification[] getCurrentNotifications() {
             if (mCurrentNotifications.size() == 0) {
                 logNLS("mCurrentNotifications size is ZERO!!");
@@ -342,15 +285,15 @@ public class NotificationMonitor extends NotificationListenerService implements 
         return new Intent(ACTION_NOTIFICATION_LISTENER_SETTINGS);
     }
 
-    public static JSONObject toJson(JsonItem item) throws JSONException {
+// HTTP PARSING FOR NOTIFICATION REMOVED
+    public static JSONObject toJson(JsonItemRemoved item) throws JSONException {
         Gson gson = new GsonBuilder().create();
         String json = gson.toJson(item);
         JSONObject jObj = new JSONObject(json);
-
         return jObj;
     }
 
-    public void sendPOST(String URL, JSONObject jsonBody){
+    public void SendHttpPostNotificationRemoved(String URL, JSONObject jsonBody){
         try {
             RequestQueue requestQueue = Volley.newRequestQueue(this);
             final String mRequestBody = jsonBody.toString();
@@ -364,13 +307,11 @@ public class NotificationMonitor extends NotificationListenerService implements 
                 @Override
                 public void onErrorResponse(VolleyError error) {
                     Log.e("LOG_VOLLEY", error.toString());
-                }
-            }) {
+                }}) {
                 @Override
                 public String getBodyContentType() {
                     return "application/json; charset=utf-8";
                 }
-
                 @Override
                 public byte[] getBody() throws AuthFailureError {
                     try {
@@ -380,7 +321,6 @@ public class NotificationMonitor extends NotificationListenerService implements 
                         return null;
                     }
                 }
-
                 @Override
                 protected Response<String> parseNetworkResponse(NetworkResponse response) {
                     String responseString = "";
@@ -392,10 +332,66 @@ public class NotificationMonitor extends NotificationListenerService implements 
                     return Response.success(responseString, HttpHeaderParser.parseCacheHeaders(response));
                 }
             };
-
             requestQueue.add(stringRequest);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
+
+    //HTTP REQUEST FOR NOTIFICATION POSTED
+
+    public static JSONObject toJson(JsonItemPosted item) throws JSONException {
+        Gson gson = new GsonBuilder().create();
+        String json = gson.toJson(item);
+        JSONObject jObj = new JSONObject(json);
+        return jObj;
+    }
+
+    public void SendHttpNotificationPosted(String URL, JSONObject jsonBody){
+        try {
+            RequestQueue requestQueue = Volley.newRequestQueue(this);
+            final String mRequestBody = jsonBody.toString();
+
+            StringRequest stringRequest = new StringRequest(Request.Method.POST, URL, new Response.Listener<String>() {
+                @Override
+                public void onResponse(String response) {
+                    Log.i("LOG_VOLLEY", response);
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Log.e("LOG_VOLLEY", error.toString());
+                }}) {
+                @Override
+                public String getBodyContentType() {
+                    return "application/json; charset=utf-8";
+                }
+                @Override
+                public byte[] getBody() throws AuthFailureError {
+                    try {
+                        return mRequestBody == null ? null : mRequestBody.getBytes("utf-8");
+                    } catch (UnsupportedEncodingException uee) {
+                        VolleyLog.wtf("Unsupported Encoding while trying to get the bytes of %s using %s", mRequestBody, "utf-8");
+                        return null;
+                    }
+                }
+                @Override
+                protected Response<String> parseNetworkResponse(NetworkResponse response) {
+                    String responseString = "";
+                    if (response != null) {
+
+                        responseString = String.valueOf(response.statusCode);
+
+                    }
+                    return Response.success(responseString, HttpHeaderParser.parseCacheHeaders(response));
+                }
+            };
+            requestQueue.add(stringRequest);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
+
 }
